@@ -2,16 +2,13 @@ package br.edu.scl.ifsp.sdm.contactlist.view
 
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.ArrayAdapter
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.core.os.BuildCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.edu.scl.ifsp.sdm.contactlist.R
@@ -51,9 +48,9 @@ class MainActivity : AppCompatActivity() {
                         if (contactsList.any { it.id == contact.id }) {
                             //Editar contato
                         } else {
-                            contactsList.plus(contact)
+                            contactsList.add(contact)
+                            contactAdapter.notifyItemChanged(contactsList.size-1)
                         }
-                        contactAdapter.notifyDataSetChanged()
                     }
                 }
             }

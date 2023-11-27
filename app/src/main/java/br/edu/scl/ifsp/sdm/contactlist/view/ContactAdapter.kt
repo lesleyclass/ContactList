@@ -11,7 +11,7 @@ import br.edu.scl.ifsp.sdm.contactlist.model.Contact
 class ContactAdapter(private val dataSet: List<Contact>) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textView: TextView = view.findViewById(R.id.nameTv)
     }
 
