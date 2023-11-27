@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">ContactList</string>
+    <string name="add_contact_menu_item_title">Add contact</string>
+    <string name="contact_name_hint">Name</string>
+    <string name="contact_address_hint">Address</string>
+    <string name="contact_phone_hint">Phone</string>
+    <string name="contact_email_hint">Email</string>
+    <string name="save_button_text">Save</string>
+    <string name="contact_details">Contact details</string>
+    <string name="contact_list">Contact list</string>
 </resources>
