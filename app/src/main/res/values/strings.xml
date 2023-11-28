@@ -8,4 +8,11 @@
     <string name="save_button_text">Save</string>
     <string name="contact_details">Contact details</string>
     <string name="contact_list">Contact list</string>
+    <string name="name_item_text">Name</string>
+    <string name="name_item_email">Email</string>
+    <string name="name_item_phone">Phone</string>
+    <string name="name_item_address">Address</string>
+    <string name="remove_contact_title">Remove Contact</string>
+    <string name="edit_contact_title">Edit Contact</string>
+    <string name="contact_removed_toast_text">Contact Removed!</string>
 </resources>

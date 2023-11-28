@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -12,24 +13,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.edu.scl.ifsp.sdm.contactlist.R
+import br.edu.scl.ifsp.sdm.contactlist.adapter.ContactAdapter
 import br.edu.scl.ifsp.sdm.contactlist.databinding.ActivityMainBinding
 import br.edu.scl.ifsp.sdm.contactlist.model.Constants.NEW_CONTACT
+import br.edu.scl.ifsp.sdm.contactlist.model.Constants.VIEW_CONTACT
 import br.edu.scl.ifsp.sdm.contactlist.model.Contact
 import br.edu.scl.ifsp.sdm.contactlist.util.getParcelableExtraCompat
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-class MainActivity : AppCompatActivity() {
-    private val contactsList: MutableList<Contact> = mutableListOf()
+class MainActivity : AppCompatActivity(), OnContactClickListener {
+    private val contactList: MutableList<Contact> = mutableListOf()
     private val amb: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
     private val recyclerView: RecyclerView by lazy {
-        findViewById(R.id.contactsRv)
+        amb.contactsRv
     }
 
     private val contactAdapter: RecyclerView.Adapter<ContactAdapter.ViewHolder> by lazy {
-        ContactAdapter(contactsList)
+        ContactAdapter(contactList, this)
     }
 
     private lateinit var contactActivityResultLauncher: ActivityResultLauncher<Intent>
@@ -44,22 +47,22 @@ class MainActivity : AppCompatActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     val contact = result.data?.getParcelableExtraCompat(NEW_CONTACT, Contact::class.java)
-                    contact?.also {
-                        if (contactsList.any { it.id == contact.id }) {
-                            //Editar contato
+                    contact?.also { newOrEditedContact ->
+                        if (contactList.any { it.id == newOrEditedContact.id }) {
+                            val position = contactList.indexOfFirst { it.id == newOrEditedContact.id }
+                            contactList[position] = newOrEditedContact
+                            contactAdapter.notifyItemChanged(position)
                         } else {
-                            contactsList.add(contact)
-                            contactAdapter.notifyItemChanged(contactsList.size-1)
+                            contactList.add(newOrEditedContact)
+                            contactAdapter.notifyItemChanged(contactList.size-1)
                         }
                     }
                 }
             }
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.setHasFixedSize(true)
-
         fillContactsList()
         recyclerView.adapter = contactAdapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -76,9 +79,31 @@ class MainActivity : AppCompatActivity() {
             else -> false
         }
     }
+
+    override fun onRemoveContactMenuItemClick(position: Int) {
+        contactList.removeAt(position)
+        contactAdapter.notifyItemRemoved(position)
+        Toast.makeText(this, getString(R.string.contact_removed_toast_text), Toast.LENGTH_SHORT).show()
+
+    }
+    override fun onEditContactMenuItemClick(position: Int) {
+        contactActivityResultLauncher.launch(Intent(this, ContactActivity::class.java).apply {
+            putExtra(NEW_CONTACT, contactList[position])
+        })
+    }
+
+    override fun onContactClick(position: Int) {
+        Intent(this, ContactActivity::class.java).apply {
+            putExtra(NEW_CONTACT, contactList[position])
+            putExtra(VIEW_CONTACT, true)
+        }.also {
+            startActivity(it)
+        }
+    }
+
     private fun fillContactsList(){
         for(i in 1..10){
-            contactsList.add(
+            contactList.add(
                 Contact(
                     id = i,
                     name = "Nome $i",
@@ -88,12 +113,5 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Fetch newItems from database
-//        recyclerView.adapter?.updateItems(newItems)
-//        recyclerView.adapter?.notifyDataSetChanged()
     }
 }
